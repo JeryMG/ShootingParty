@@ -17,7 +17,7 @@ public class Projectile : MonoBehaviour
         Collider[] initialCollisions = Physics.OverlapSphere(transform.position, .1f, CollisionMask);
         if (initialCollisions.Length >0)
         {
-            onHitObject(initialCollisions[0]);
+            onHitObject(initialCollisions[0], transform.position);
         }
     }
 
@@ -35,27 +35,16 @@ public class Projectile : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, moveDistance + SkinWidth, CollisionMask, QueryTriggerInteraction.Collide))
         {
-            onHitObject(hit);
+            onHitObject(hit.collider, hit.point);
         }
     }
 
-    private void onHitObject(RaycastHit hit)
-    {
-        print(hit.collider.name);
-        IDamageable damageableObject = hit.collider.GetComponent<IDamageable>();
-        if (damageableObject != null)
-        {
-            damageableObject.TakeHit(damage, hit);
-        }
-        Destroy(gameObject);
-    }
-
-    void onHitObject(Collider collider)
+    void onHitObject(Collider collider, Vector3 hitPoint)
     {
         IDamageable damageableObject = collider.GetComponent<IDamageable>();
         if (damageableObject != null)
         {
-            damageableObject.TakeDamage(damage);
+            damageableObject.TakeHit(damage, hitPoint, transform.forward);
         }
         Destroy(gameObject);
     } //In case projo spawn inside enemy

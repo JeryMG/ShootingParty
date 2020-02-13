@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Quaternion = System.Numerics.Quaternion;
 
 [RequireComponent(typeof(NavMeshAgent))]
 public class Enemy : LivingEntity
@@ -13,6 +14,8 @@ public class Enemy : LivingEntity
         Chasing,
         Attacking
     }
+
+    public ParticleSystem DeathEffect;
 
     private State currentState;
     private NavMeshAgent pathFinder;
@@ -112,6 +115,15 @@ public class Enemy : LivingEntity
         skinMat.color = originalColor;
         currentState = State.Chasing;
         pathFinder.enabled = true;
+    }
+
+    public override void TakeHit(float damage, Vector3 hitPoint, Vector3 hitDirection)
+    {
+        if (damage >= health)
+        {
+            Destroy(Instantiate(DeathEffect, hitPoint, UnityEngine.Quaternion.FromToRotation(Vector3.forward, hitDirection)),DeathEffect.main.startLifetimeMultiplier);
+        }
+        base.TakeHit(damage, hitPoint, hitDirection);
     }
 
     private void OnTargetDeath()
